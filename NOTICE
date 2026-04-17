@@ -1,0 +1,18 @@
+ObfuScale — Measuring Malware Obfuscation
+
+Copyright (c) 2025 Michael Reglein
+Licensed under the Apache License, Version 2.0.
+
+This project depends on external datasets and references not included here:
+
+- SOREL-20M dataset (Sophos & ReversingLabs), licensed separately.
+  See: https://github.com/sophos-ai/SOREL-20M
+- Benign Windows binaries harvested locally are proprietary (Microsoft) and
+  are not redistributed.
+- Algorithmic ideas draw on prior research, including (non-exhaustive):
+  - EMBER feature extraction (Raff et al.)
+  - Windowed-entropy histograms (Harang & Rudd)
+  - Obfuscation & AI detection reviews cited in the paper
+
+All original source code in this repository is © 2025 Michael Reglein,
+licensed under the Apache License, Version 2.0.
