@@ -12,20 +12,24 @@
 
 # ObfuScale
 
-ObfuScale provides a consistent "yardstick" for measuring the impact of 
-obfuscation on malware detection models. It introduces a reproducible 
+ObfuScale is a framework for measuring how binary-to-image CNN malware 
+detection models respond to obfuscation. It defines a byte-level 
 obfuscation ladder (L0–L3), converts binaries into byteplot images, and 
-benchmarks convolutional neural networks (ResNet, ConvNeXt) across 
-representation choices and exposure policies. The framework validates 
-obfuscation difficulty using a challenge score based on Jensen–Shannon 
-divergence, ensuring that each level reflects a measurable increase in 
-complexity.
+evaluates convolutional neural networks (ResNet, ConvNeXt) across 
+representation choices and exposure policies. A Jensen–Shannon-divergence 
+based "challenge score" measures how much an obfuscated variant's byte 
+distribution diverges from its original — a descriptive statistic about 
+the transform, not a validated predictor of detection difficulty.
 
 ## Status
 
-Active development. This repository is being prepared for full public 
-release. Core pipeline, documentation, and reproducibility materials 
-are being finalized.
+Pre-release, under active rework. An earlier version of this repository 
+shipped a demo command that wrote fabricated benchmark metrics, and 
+documented an obfuscation ladder whose L1/L2 levels were byte-identical 
+to L0 due to an implementation bug. Both issues are being corrected as 
+part of a from-scratch, honestly-reported rerun of the pipeline; this 
+README will be updated to reflect real results once they exist. Core 
+pipeline code (`src/obfuscale/`) is currently unimplemented scaffolding.
 
 ## Research Context
 
@@ -42,10 +46,9 @@ dataset.
 
 ## What's Here Now
 
-- `src/obfuscale/` — core package (challenge scoring, image pipeline, baseline CNN)
+- `src/obfuscale/` — package scaffolding (challenge scoring, image pipeline, baseline CNN); these modules are currently stubs, not working implementations
 - `docs/` — methodology notes and repo layout
-- `configs/` — example configuration structure
-- `env/` — reproducible environment specification
+- `env/` — environment specification
 
 ## Coming Soon
 
