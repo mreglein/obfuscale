@@ -8,6 +8,7 @@ was built to catch (manifest_pairs.csv, challenge_counts*.csv) were already
 committed; a staged-only check could never have found them. Run manually,
 via pre-commit (local hook), and in CI.
 """
+
 from __future__ import annotations
 
 import re
@@ -26,16 +27,54 @@ ALLOWLIST: set[str] = {
 }
 
 BINARY_EXTS = {
-    ".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf",
-    ".bin", ".exe", ".dll", ".sys", ".db", ".pyc",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".ico",
+    ".pdf",
+    ".bin",
+    ".exe",
+    ".dll",
+    ".sys",
+    ".db",
+    ".pyc",
 }
 
+# Generic host-identifying patterns (public). Internal hostnames are NOT
+# listed here -- naming them in a public denylist would publish the very
+# strings this check exists to keep out. They are loaded from a gitignored
+# local file `.leak-hostnames.local` (one name per line, `#` comments) or the
+# env var OBFUSCALE_LEAK_HOSTNAMES (comma-separated). CI without either still
+# enforces the path patterns; the local pre-commit hook enforces both.
 PATTERNS = [
     re.compile(r"/home/[a-zA-Z0-9_.\-]+"),
     re.compile(r"/mnt/[a-zA-Z0-9_.\-]+"),
-    re.compile(r"\bhermes\b", re.IGNORECASE),
-    re.compile(r"\bxerxes\b", re.IGNORECASE),
-    re.compile(r"\batlantis\b", re.IGNORECASE),
+    re.compile(r"[A-Za-z]:\\Users\\[a-zA-Z0-9_.\-]+"),
+    re.compile(r"\\\\[a-zA-Z0-9_.\-]+\\"),  # UNC share
+]
+
+
+def _private_hostnames() -> list[str]:
+    import os
+
+    names: list[str] = []
+    local = REPO_ROOT / ".leak-hostnames.local"
+    if local.is_file():
+        for line in local.read_text().splitlines():
+            line = line.split("#", 1)[0].strip()
+            if line:
+                names.append(line)
+    names += [
+        n.strip()
+        for n in os.environ.get("OBFUSCALE_LEAK_HOSTNAMES", "").split(",")
+        if n.strip()
+    ]
+    return names
+
+
+PATTERNS += [
+    re.compile(rf"\b{re.escape(n)}\b", re.IGNORECASE) for n in _private_hostnames()
 ]
 
 
@@ -65,7 +104,10 @@ def main() -> int:
                     break
 
     if hits:
-        print(f"check_no_local_paths: {len(hits)} hit(s) in tracked files:", file=sys.stderr)
+        print(
+            f"check_no_local_paths: {len(hits)} hit(s) in tracked files:",
+            file=sys.stderr,
+        )
         for h in hits:
             print(f"  {h}", file=sys.stderr)
         print(
